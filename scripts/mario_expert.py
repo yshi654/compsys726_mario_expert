@@ -102,8 +102,11 @@ class MarioExpert:
         self.video = None
 
     def choose_action(self):
+        # current scores; number of lives
         state = self.environment.game_state()
+        # rgb image can do computer version on and extract features to do
         frame = self.environment.grab_frame()
+        # a processed version of the frame
         game_area = self.environment.game_area()
 
         # Implement your code here to choose the best action
