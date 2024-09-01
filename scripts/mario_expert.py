@@ -118,27 +118,28 @@ class MarioExpert:
         game_area_list_t = game_area.T.tolist()
 
     # Locate Mario in the grid
-        x_list = [x for x in game_area_list if MARIO in x]
-        if x_list != []:
-            x = x_list[0]
-            mario_x = game_area_list.index(x)
-            mario_y = x.index(MARIO)
+        mario_list = [x for x in game_area_list if MARIO in x]
+        if mario_list:
+            mario_row = mario_list[0]
+            mario_x = game_area_list.index(mario_row)
+            mario_y = mario_row.index(MARIO)
         else:
-            return 0 # No action if Mario is not found
+            return 0  # No action if Mario is not found
 
      # Search for mushrooms in the grid
-        x_list = [x for x in game_area_list if MUSHROOM in x]
-        if x_list != []:
-            x = x_list[0]
-            mushroom_x = game_area_list.index(x)
-            mushroom_y = x.index(MUSHROOM)
+        mushroom_list = [x for x in game_area_list if MUSHROOM in x]
+        if mushroom_list:
+            mushroom_row = mushroom_list[0]
+            mushroom_x = game_area_list.index(mushroom_row)
+            mushroom_y = mushroom_row.index(MUSHROOM)
         else:
             mushroom_x = -1
             mushroom_y = -1
 
         # Analyze the grid for enemies in Mario's row
         enemy_list_t = game_area_list_t[mario_y:]
-        x_list = [x for x in enemy_list_t if ENEMY_CHIBIBO in x or ENEMY_NOKOBON in x or ENEMY_SUU in x or ENEMY_KUMO in x]
+        x_list = [x for x in enemy_list_t if
+                  ENEMY_CHIBIBO in x or ENEMY_NOKOBON in x or ENEMY_SUU in x or ENEMY_KUMO in x]
         if x_list != []:
             x = x_list[0]
             enemy_y = enemy_list_t.index(x) + mario_y
@@ -149,21 +150,21 @@ class MarioExpert:
             enemy_type = 0
 
         # Identify boxes within the transposed grid
-        x_list = [x for x in game_area_list_t if BOX in x]
-        if x_list != []:
-            x = x_list[0]
-            box_y = game_area_list_t.index(x)
-            box_x = x.index(BOX)
+        box_list = [x for x in game_area_list_t if BOX in x]
+        if box_list:
+            box_row = box_list[0]
+            box_y = game_area_list_t.index(box_row)
+            box_x = box_row.index(BOX)
         else:
             box_y = -1
             box_x = -1
 
         # Check for coins
-        x_list = [x for x in game_area_list_t if COIN in x]
-        if x_list != []:
-            x = x_list[0]
-            coin_y = game_area_list_t.index(x)
-            coin_x = len(x) - 1 - x[::-1].index(COIN)
+        coin_list = [x for x in game_area_list_t if COIN in x]
+        if coin_list:
+            coin_row = coin_list[0]
+            coin_y = game_area_list_t.index(coin_row)
+            coin_x = len(coin_row) - 1 - coin_row[::-1].index(COIN)
         else:
             coin_y = -1
             coin_x = -1
