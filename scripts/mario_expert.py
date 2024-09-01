@@ -117,7 +117,7 @@ class MarioExpert:
         game_area_list = game_area.tolist()
         game_area_list_t = game_area.T.tolist()
 
-    # Locate Mario in the grid
+    # find mario
         mario_list = [x for x in game_area_list if MARIO in x]
         if mario_list:
             mario_row = mario_list[0]
@@ -126,7 +126,7 @@ class MarioExpert:
         else:
             return 0  # No action if Mario is not found
 
-     # Search for mushrooms in the grid
+    # find mushroom
         mushroom_list = [x for x in game_area_list if MUSHROOM in x]
         if mushroom_list:
             mushroom_row = mushroom_list[0]
@@ -136,20 +136,19 @@ class MarioExpert:
             mushroom_x = -1
             mushroom_y = -1
 
-        # Analyze the grid for enemies in Mario's row
-        enemy_list_t = game_area_list_t[mario_y:]
-        x_list = [x for x in enemy_list_t if
-                  ENEMY_CHIBIBO in x or ENEMY_NOKOBON in x or ENEMY_SUU in x or ENEMY_KUMO in x]
-        if x_list != []:
-            x = x_list[0]
-            enemy_y = enemy_list_t.index(x) + mario_y
-            y_list = [y for y in x if y >= ENEMY_CHIBIBO and y <= ENEMY_KUMO]
-            enemy_x = x.index(y_list[0])
-            enemy_type = y_list[0]
+    # find enemy
+        enemy_list = [x for x in game_area_list_t[mario_y:] if
+                      ENEMY_CHIBIBO in x or ENEMY_NOKOBON in x or ENEMY_SUU in x or ENEMY_KUMO in x]
+        if enemy_list:
+            enemy_row = enemy_list[0]
+            enemy_y = game_area_list_t[mario_y:].index(enemy_row) + mario_y
+            enemy_types = [y for y in enemy_row if y >= ENEMY_CHIBIBO and y <= ENEMY_KUMO]
+            enemy_x = enemy_row.index(enemy_types[0])
+            enemy_type = enemy_types[0]
         else:
             enemy_type = 0
 
-        # Identify boxes within the transposed grid
+    # find box
         box_list = [x for x in game_area_list_t if BOX in x]
         if box_list:
             box_row = box_list[0]
@@ -159,7 +158,7 @@ class MarioExpert:
             box_y = -1
             box_x = -1
 
-        # Check for coins
+    # find coins
         coin_list = [x for x in game_area_list_t if COIN in x]
         if coin_list:
             coin_row = coin_list[0]
@@ -169,7 +168,7 @@ class MarioExpert:
             coin_y = -1
             coin_x = -1
 
-        # Decide on actions based on game entity positions and states
+    # Decide on actions based on game entity positions and states
 
         if enemy_type == ENEMY_KUMO and (mario_x == enemy_x) and ((mario_y + 2 == enemy_y) or (mario_y + 3 == enemy_y)):
             return LONG_JUMP
