@@ -97,50 +97,30 @@ class MarioExpert:
         frame = self.environment.grab_frame()
         game_area = self.environment.game_area()
         # Implement your code here to choose the best action
-
-        DOWN = 0
-        LEFT = 1
-        RIGHT = 2
-        UP = 3
-        BUTTON_A = 4
-        BUTTON_B = 5
-        RUN_JUMP = 6
-        LONG_JUMP = 7
-        HOLE = 0
-        MARIO = 1
-        COIN = 5
-        MUSHROOM = 6
-        HILL = 10
-        BLOCK = 12
-        BOX = 13
-        PIPE = 14
-        ENEMY1 = 15  # chibibo
-        ENEMY2 = 16  # nokobon
-        ENEMY3 = 17  # Suu
-        ENEMY4 = 18  # kumo
-        mario_x = 0
-        mario_y = 0
-        enemy_x = 0
-        enemy_y = 0
-        enemy_type = 0
-        mushroom_x = 0
-        mushroom_y = 0
-        box_x = 0
-        box_y = 0
-        coin_y = 0
-        coin_x = 0
-
+        # Constants for actions and entities in the game
+        DOWN,LEFT,RIGHT,UP = 0,1,2,3
+        BUTTON_A,BUTTON_B,RUN_JUMP,LONG_JUMP = 4,5,6,7
+        # Constants for objects in the game environment
+        HOLE,MARIO,COIN,MUSHROOM,HILL,BLOCK,BOX,PIPE = 0,1,5,6,10,12,13,14
+        ENEMY_CHIBIBO = 15
+        ENEMY_NOKOBON = 16
+        ENEMY_SUU = 17
+        ENEMY_KUMO = 18
+        # Initialize Mario's position and related variables
+        (mario_x,mario_y,enemy_x,enemy_y,enemy_type,
+         mushroom_x,mushroom_y,box_x,box_y,coin_y,coin_x) = 0,0,0,0,0,0,0,0,0,0,0
+        # Convert the game area into a list for processing
         game_area_list = game_area.tolist()
         game_area_list_t = game_area.T.tolist()
-
+        # Locate Mario in the grid
         x_list = [x for x in game_area_list if MARIO in x]
         if x_list != []:
             x = x_list[0]
             mario_x = game_area_list.index(x)
             mario_y = x.index(MARIO)
         else:
-            return 0
-
+            return 0 # No action if Mario is not found
+        # Search for mushrooms in the grid
         x_list = [x for x in game_area_list if MUSHROOM in x]
         if x_list != []:
             x = x_list[0]
@@ -149,19 +129,19 @@ class MarioExpert:
         else:
             mushroom_x = -1
             mushroom_y = -1
-
+        # Analyze the grid for enemies in Mario's row
         enemy_list_t = game_area_list_t[mario_y:]
-        x_list = [x for x in enemy_list_t if ENEMY1 in x or ENEMY2 in x or ENEMY3 in x or ENEMY4 in x]
+        x_list = [x for x in enemy_list_t if ENEMY_CHIBIBO in x or ENEMY_NOKOBON in x or ENEMY_SUU in x or ENEMY_KUMO in x]
 
         if x_list != []:
             x = x_list[0]
             enemy_y = enemy_list_t.index(x) + mario_y
-            y_list = [y for y in x if y >= ENEMY1 and y <= ENEMY4]
+            y_list = [y for y in x if y >= ENEMY_CHIBIBO and y <= ENEMY_KUMO]
             enemy_x = x.index(y_list[0])
             enemy_type = y_list[0]
         else:
             enemy_type = 0
-
+        # Identify boxes within the transposed grid
         x_list = [x for x in game_area_list_t if BOX in x]
         if x_list != []:
             x = x_list[0]
@@ -170,7 +150,7 @@ class MarioExpert:
         else:
             box_y = -1
             box_x = -1
-
+        # Check for coins
         x_list = [x for x in game_area_list_t if COIN in x]
         if x_list != []:
             x = x_list[0]
@@ -180,8 +160,9 @@ class MarioExpert:
             coin_y = -1
             coin_x = -1
 
+        # Decide on actions based on game entity positions and states
         # enemy is able to fly, need a long jump
-        if enemy_type == ENEMY4:
+        if enemy_type == ENEMY_KUMO:
             if (mario_x == enemy_x) and ((mario_y + 2 == enemy_y) or (mario_y + 3 == enemy_y)):
                 return LONG_JUMP
 
@@ -190,7 +171,7 @@ class MarioExpert:
             return LEFT
 
         # enemy is not able to fly, jump to skip or step
-        if enemy_type != ENEMY4:
+        if enemy_type != ENEMY_KUMO:
             if (mario_x + 1 == enemy_x or mario_x == enemy_x) and mario_y + 4 >= enemy_y and mario_y <= enemy_y:
                 return BUTTON_A
 
