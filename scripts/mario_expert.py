@@ -48,6 +48,9 @@ class MarioController(MarioEnvironment):
         self.release_button = release_button  # Store the release actions.
 
     def run_action(self, action: int) -> None:
+        if action not in [0, 1, 2, 3, 4, 5, 6, 7]:  # Assuming these are all the valid actions
+            print(f"Received invalid action {action}, defaulting to no action.")
+            return
         # Handle running jump actions specifically.
         if action == 6:  # If the action is a "run jump".
             # Send the command to press the right arrow and the button A.
@@ -110,11 +113,11 @@ class MarioExpert:
         (mario_x,mario_y,enemy_x,enemy_y,enemy_type,
          mushroom_x,mushroom_y,box_x,box_y,coin_y,coin_x) = 0,0,0,0,0,0,0,0,0,0,0
 
-        # Convert the game area into a list for processing
+    # Convert the game area into a list for processing
         game_area_list = game_area.tolist()
         game_area_list_t = game_area.T.tolist()
 
-        # Locate Mario in the grid
+    # Locate Mario in the grid
         x_list = [x for x in game_area_list if MARIO in x]
         if x_list != []:
             x = x_list[0]
@@ -123,7 +126,7 @@ class MarioExpert:
         else:
             return 0 # No action if Mario is not found
 
-        # Search for mushrooms in the grid
+     # Search for mushrooms in the grid
         x_list = [x for x in game_area_list if MUSHROOM in x]
         if x_list != []:
             x = x_list[0]
