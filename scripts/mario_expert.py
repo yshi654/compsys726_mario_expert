@@ -82,14 +82,11 @@ class MarioController(MarioEnvironment):
             if action == 4:
                 self.pyboy.tick()
 
-
 class MarioExpert:
 
     def __init__(self, results_path: str, headless=False):
         self.results_path = results_path
-
         self.environment = MarioController(headless=headless)
-
         self.video = None
 
     def choose_action(self):
@@ -97,21 +94,26 @@ class MarioExpert:
         frame = self.environment.grab_frame()
         game_area = self.environment.game_area()
         # Implement your code here to choose the best action
+
         # Constants for actions and entities in the game
         DOWN,LEFT,RIGHT,UP = 0,1,2,3
         BUTTON_A,BUTTON_B,RUN_JUMP,LONG_JUMP = 4,5,6,7
+
         # Constants for objects in the game environment
         HOLE,MARIO,COIN,MUSHROOM,HILL,BLOCK,BOX,PIPE = 0,1,5,6,10,12,13,14
         ENEMY_CHIBIBO = 15
         ENEMY_NOKOBON = 16
         ENEMY_SUU = 17
         ENEMY_KUMO = 18
+
         # Initialize Mario's position and related variables
         (mario_x,mario_y,enemy_x,enemy_y,enemy_type,
          mushroom_x,mushroom_y,box_x,box_y,coin_y,coin_x) = 0,0,0,0,0,0,0,0,0,0,0
+
         # Convert the game area into a list for processing
         game_area_list = game_area.tolist()
         game_area_list_t = game_area.T.tolist()
+
         # Locate Mario in the grid
         x_list = [x for x in game_area_list if MARIO in x]
         if x_list != []:
@@ -120,6 +122,7 @@ class MarioExpert:
             mario_y = x.index(MARIO)
         else:
             return 0 # No action if Mario is not found
+
         # Search for mushrooms in the grid
         x_list = [x for x in game_area_list if MUSHROOM in x]
         if x_list != []:
@@ -129,10 +132,10 @@ class MarioExpert:
         else:
             mushroom_x = -1
             mushroom_y = -1
+
         # Analyze the grid for enemies in Mario's row
         enemy_list_t = game_area_list_t[mario_y:]
         x_list = [x for x in enemy_list_t if ENEMY_CHIBIBO in x or ENEMY_NOKOBON in x or ENEMY_SUU in x or ENEMY_KUMO in x]
-
         if x_list != []:
             x = x_list[0]
             enemy_y = enemy_list_t.index(x) + mario_y
@@ -141,6 +144,7 @@ class MarioExpert:
             enemy_type = y_list[0]
         else:
             enemy_type = 0
+
         # Identify boxes within the transposed grid
         x_list = [x for x in game_area_list_t if BOX in x]
         if x_list != []:
@@ -150,6 +154,7 @@ class MarioExpert:
         else:
             box_y = -1
             box_x = -1
+
         # Check for coins
         x_list = [x for x in game_area_list_t if COIN in x]
         if x_list != []:
@@ -161,80 +166,61 @@ class MarioExpert:
             coin_x = -1
 
         # Decide on actions based on game entity positions and states
-        # enemy is able to fly, need a long jump
-        if enemy_type == ENEMY_KUMO:
-            if (mario_x == enemy_x) and ((mario_y + 2 == enemy_y) or (mario_y + 3 == enemy_y)):
-                return LONG_JUMP
 
-        # enemy is falling from above, turn left to avoid
+        if enemy_type == ENEMY_KUMO and (mario_x == enemy_x) and ((mario_y + 2 == enemy_y) or (mario_y + 3 == enemy_y)):
+            return LONG_JUMP
+
         if (mario_x >= enemy_x + 1) and (mario_x <= enemy_x + 3) and (mario_y < enemy_y) and (mario_y + 4 >= enemy_y):
             return LEFT
 
-        # enemy is not able to fly, jump to skip or step
-        if enemy_type != ENEMY_KUMO:
-            if (mario_x + 1 == enemy_x or mario_x == enemy_x) and mario_y + 4 >= enemy_y and mario_y <= enemy_y:
-                return BUTTON_A
+        if enemy_type != ENEMY_KUMO and (mario_x + 1 == enemy_x or mario_x == enemy_x) and mario_y + 4 >= enemy_y and mario_y <= enemy_y:
+            return BUTTON_A
 
-        # mario on ground level and a hole ahead
-        if (mario_y <= 15):
-            if mario_x == 12 and (game_area[14][mario_y + 2] == HOLE or game_area[14][mario_y + 3] == HOLE):
-                return LONG_JUMP
+        if (mario_y <= 15) and (mario_x == 12) and (game_area[14][mario_y + 2] == HOLE or game_area[14][mario_y + 3] == HOLE):
+            return LONG_JUMP
 
-        # There is a mushroom on the left
         if mushroom_y != -1 and mushroom_y < mario_y:
             return LEFT
 
         if mario_x <= 14 and mario_y <= 16:
-
-            # There is a long pipe blocking the road
             if game_area[mario_x - 2][mario_y + 1] == PIPE or game_area[mario_x - 2][mario_y + 2] == PIPE:
                 return LONG_JUMP
 
-            # There is a pipe blocking the road
             if game_area[mario_x + 1][mario_y + 2] == PIPE:
                 return RUN_JUMP
 
-            # It is a blocked tunnel and need to go back
             if (game_area[mario_x][mario_y + 2] == HILL or game_area[mario_x + 1][mario_y + 2] == HILL) and (
                     game_area[mario_x - 1][mario_y + 1] == HILL or game_area[mario_x - 1][mario_y + 2] == HILL or
                     game_area[mario_x + 1][mario_y + 2] == HILL) and (game_area[mario_x + 1][mario_y + 2] == HOLE):
                 return LEFT
 
-                # A hill ahead and need to jump
             if game_area[mario_x][mario_y + 2] == HILL or game_area[mario_x + 1][mario_y + 2] == HILL:
                 return LONG_JUMP
 
-            # if there is a block blocking ahead, jump
             if (game_area[mario_x][mario_y + 2] == BLOCK or game_area[mario_x + 1][mario_y + 2] == BLOCK):
                 return BUTTON_A
 
-        # if mario is above the ground and there is a coin somewhere below
         if (mario_x < 12) and (mario_x < coin_x - 1):
             if mario_y == coin_y - 2:
                 return DOWN
             if mario_y > coin_y - 2 and game_area[coin_x - 1][coin_y] != HILL:
                 return LEFT
 
-        # mario on high level and a hole ahead
         if (mario_y <= 12):
-
             if mario_x < 12 and game_area[mario_x + 2][mario_y] != 0:
                 if (game_area[14][mario_y + 3] == HOLE or game_area[14][mario_y + 4] == HOLE or game_area[14][
                     mario_y + 5] == HOLE):
                     if game_area[mario_x - 2][mario_y + 1] == 0:
                         return LONG_JUMP
 
-        if (box_x != -1):
-            # if there is a ? box above the ground level and on the left, move left
-            if (mario_x > box_x and mario_x <= box_x + 3) and game_area[mario_x + 1][mario_y - 1] == 0:
+        if (box_x != -1) and (mario_x > box_x and mario_x <= box_x + 3) and game_area[mario_x + 1][mario_y - 1] == 0:
                 if box_y <= mario_y:
                     return LEFT
 
-        # if there is a ? box above the ground level and on the right ahead, jump
-        if mario_x > box_x and mario_x <= box_x + 3 and mario_y < box_y and mario_y + 1 >= box_y:
+        if (mario_x > box_x and mario_x <= box_x + 3 and mario_y < box_y and mario_y + 1 >= box_y):
             return BUTTON_A
 
-        # move forward
+        # Default action is to move forward
         return RIGHT
 
     def step(self):
