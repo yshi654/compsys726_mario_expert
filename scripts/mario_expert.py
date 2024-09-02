@@ -194,24 +194,21 @@ class MarioExpert:
             # if there is a pipe blocking ahead
             if game_area[mario_x + 1][mario_y + 2] == pipe:
                 return run_jump
-
             # if there is a wall ahead
             if (game_area[mario_x][mario_y + 2] == wall) or (game_area[mario_x + 1][mario_y + 2] == wall):
                 return long_jump
-
             # if there is a block ahead
             if (game_area[mario_x][mario_y + 2] == block) or (game_area[mario_x + 1][mario_y + 2] == block):
                 return button_a
 
         # if there is a hole ahead
-        if (mario_y <= 15) and (mario_x == 12) and (
-                game_area[14][mario_y + 2] == hole or game_area[14][mario_y + 3] == hole):
+        if (mario_y <= 15) and (mario_x == 12) and (game_area[15][mario_y + 2] == hole or game_area[15][mario_y + 3] == hole):
             return long_jump
 
         # if there is a hole ahead and on high level
-        if (mario_y <= 12) and (mario_x < 12) and (game_area[mario_x + 2][mario_y] != 0):
-            if (game_area[14][mario_y + 3] == hole) or (game_area[14][mario_y + 4] == hole) or (
-                    game_area[14][mario_y + 5] == hole):
+        if (mario_y <= 15) and (mario_x < 12) and (game_area[mario_x + 2][mario_y] != 0):
+            if (game_area[15][mario_y + 3] == hole) or (game_area[15][mario_y + 4] == hole) or (
+                    game_area[15][mario_y + 5] == hole):
                 if game_area[mario_x - 2][mario_y + 1] == 0:
                     return long_jump
 
