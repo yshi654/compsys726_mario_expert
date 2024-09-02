@@ -178,15 +178,11 @@ class MarioExpert:
             return LONG_JUMP
 
     # if meet an enemy that can't fly, jump it
-        if (enemy_type != ENEMY_KUMO) and (mario_x + 1 == enemy_x or mario_x == enemy_x) and (mario_y + 4 >= enemy_y) and (mario_y <= enemy_y):
+        if (enemy_type != ENEMY_KUMO) and ( mario_x == enemy_x or mario_x + 1 == enemy_x) and (mario_y + 4 >= enemy_y) and (mario_y <= enemy_y):
             return BUTTON_A
 
     # if there is an enemy falling from above
         if (mario_x >= enemy_x + 1) and (mario_x <= enemy_x + 3) and (mario_y < enemy_y) and (mario_y + 4 >= enemy_y):
-            return LEFT
-
-    # if there is a mushroom on the left
-        if mushroom_y != -1 and mushroom_y < mario_y:
             return LEFT
 
         if (mario_x <= 14) and (mario_y <= 16):
@@ -215,14 +211,18 @@ class MarioExpert:
                     if game_area[mario_x - 2][mario_y + 1] == 0:
                         return LONG_JUMP
 
-    # if there is a ? box on the left
+    # if there is a box on the left
         if (box_x != -1) and (mario_x > box_x and mario_x <= box_x + 3) and game_area[mario_x + 1][mario_y - 1] == 0:
                 if box_y <= mario_y:
                     return LEFT
 
-    # if there is a ? box on the right
+    # if there is a box on the right
         if (mario_x > box_x and mario_x <= box_x + 3 and mario_y < box_y and mario_y + 1 >= box_y):
             return BUTTON_A
+
+    # if there is a mushroom
+        if mushroom_y != -1 and mushroom_y < mario_y:
+            return LEFT
 
     # Default action is to move forward
         return RIGHT
